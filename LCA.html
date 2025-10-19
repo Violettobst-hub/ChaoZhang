@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Workflow LCA Assessment</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .slide {
+            padding: 30px;
+            display: none;
+        }
+        .slide.active {
+            display: block;
+        }
+        .progress-bar {
+            height: 6px;
+            background: #e0e0e0;
+            margin-bottom: 30px;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3498db, #2ecc71);
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 24px;
+            text-align: center;
+        }
+        .question {
+            font-size: 18px;
+            color: #34495e;
+            margin-bottom: 25px;
+            text-align: center;
+            line-height: 1.4;
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #5d6d7e;
+            font-weight: 500;
+        }
+        input[type="number"], select {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e3e8f0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        input[type="number"]:focus, select:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+        .scale-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 5px;
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+        .btn {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            padding: 16px 30px;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+            transition: transform 0.2s;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        .btn-secondary {
+            background: #95a5a6;
+        }
+        .result-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border-left: 4px solid #3498db;
+        }
+        .score {
+            font-size: 32px;
+            font-weight: bold;
+            text-align: center;
+            margin: 10px 0;
+        }
+        .score-good { color: #27ae60; }
+        .score-warning { color: #f39c12; }
+        .score-critical { color: #e74c3c; }
+        .suggestion {
+            background: #e8f6f3;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 4px solid #2ecc71;
+        }
+        .navigation {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .navigation button {
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Progress Bar -->
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+
+        <!-- Slide 1: Introduction -->
+        <div class="slide active" id="slide1">
+            <h1>🧠 Personal Workflow LCA</h1>
+            <div class="question">
+                Welcome! This assessment will analyze your research workflow sustainability using Life Cycle Assessment principles.
+                <br><br>
+                You'll answer 8 questions and receive personalized scores and improvement suggestions.
+            </div>
+            <button class="btn" onclick="nextSlide()">Start Assessment</button>
+        </div>
+
+        <!-- Slide 2: Deep Work -->
+        <div class="slide" id="slide2">
+            <h1>Deep Work Analysis</h1>
+            <div class="question">How many hours of DEEP WORK did you achieve last week? (Focused, uninterrupted work)</div>
+            <div class="input-group">
+                <input type="number" id="deepWork" min="0" max="40" value="10" onchange="saveAnswer('deepWork', this.value)">
+                <div class="scale-labels">
+                    <span>0h (None)</span>
+                    <span>40h (Maximum)</span>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="btn btn-secondary" onclick="prevSlide()">Back</button>
+                <button class="btn" onclick="nextSlide()">Next</button>
+            </div>
+        </div>
+
+        <!-- Slide 3: Sleep Quality -->
+        <div class="slide" id="slide3">
+            <h1>Energy Inputs</h1>
+            <div class="question">Rate your SLEEP QUALITY this week (1-10)</div>
+            <div class="input-group">
+                <input type="number" id="sleepQuality" min="1" max="10" value="6" onchange="saveAnswer('sleepQuality', this.value)">
+                <div class="scale-labels">
+                    <span>1 (Poor)</span>
+                    <span>10 (Excellent)</span>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="btn btn-secondary" onclick="prevSlide()">Back</button>
+                <button class="btn" onclick="nextSlide()">Next</button>
+            </div>
+        </div>
+
+        <!-- Slide 4: Physical Activity -->
+        <div class="slide" id="slide4">
+            <h1>Physical Energy</h1>
+            <div class="question">How many hours of PHYSICAL ACTIVITY did you get?</div>
+            <div class="input-group">
+                <input type="number" id="physicalActivity" min="0" max="15" value="3" onchange="saveAnswer('physicalActivity', this.value)">
+                <div class="scale-labels">
+                    <span>0h</span>
+                    <span>15h+</span>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="btn btn-secondary" onclick="prevSlide()">Back</button>
+                <button class="btn" onclick="nextSlide()">Next</button>
+            </div>
+        </div>
+
+        <!-- Slide 5: Time Allocation -->
+        <div class="slide" id="slide5">
+            <h1>Time Distribution</h1>
+            <div class="question">Which activity consumed MOST of your productive time?</div>
+            <div class="input-group">
+                <select id="timeConsumption" onchange="saveAnswer('timeConsumption', this.value)">
+                    <option value="deepWork">Deep Research Work</option>
+                    <option value="meetings">Meetings & Collaboration</option>
+                    <option value="teaching">Teaching & Supervision</option>
+                    <option value="admin">Administration & Emails</option>
+                    <option value="learning">Learning & Development</option>
+                </select>
+            </div>
+            <div class="navigation">
+                <button class="btn btn-secondary" onclick="prevSlide()">Back</button>
+                <button class="btn" onclick="nextSlide()">Next</button>
+            </div>
+        </div>
+
+        <!-- Slide 6: Waste Streams -->
+        <div class="slide" id="slide6">
+            <h1>Waste Identification</h1>
+            <div class="question">What's your biggest productivity WASTE STREAM?</div>
+            <div class="input-group">
+                <select id="wasteStream" onchange="saveAnswer('wasteStream', this.value)">
+                    <option value="contextSwitching">Context Switching</option>
+                    <option value="meetings">Unproductive Meetings</option>
+                    <option value="procrastination">Procrastination</option>
+                    <option value="email">Email Overload</option>
+                    <option value="admin">Administrative Tasks</option>
+                    <option value="technical">Technical Problems</option>
+                </select>
+            </div>
+            <div class="navigation">
+                <button class="btn btn-secondary" onclick="prevSlide()">Back</button>
+                <button class="btn" onclick="nextSlide()">Next</button>
+            </div>
+        </div>
+
+        <!-- Slide 7: Satisfaction -->
+        <div class="slide" id="slide7">
+            <h1>Emotional Outputs</h1>
+            <div class="question">Rate your WORK SATISFACTION this week (1-10)</div>
+            <div class="input-group">
+                <input type="number" id="satisfaction" min="1" max="10" value="6" onchange="saveAnswer('satisfaction', this.value)">
+                <div class="scale-labels">
+                    <span>1 (Low)</span>
+                    <span>10 (High)</span>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="btn btn-secondary" onclick="prevSlide()">Back</button>
+                <button class="btn" onclick="nextSlide()">Next</button>
+            </div>
+        </div>
+
+        <!-- Slide 8: Frustration -->
+        <div class="slide" id="slide8">
+            <h1>Frustration Level</h1>
+            <div class="question">Rate your FRUSTRATION level this week (1-10)</div>
+            <div class="input-group">
+                <input type="number" id="frustration" min="1" max="10" value="4" onchange="saveAnswer('frustration', this.value)">
+                <div class="scale-labels">
+                    <span>1 (None)</span>
+                    <span>10 (Extreme)</span>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="btn btn-secondary" onclick="prevSlide()">Back</button>
+                <button class="btn" onclick="calculateResults()">See My Results</button>
+            </div>
+        </div>
+
+        <!-- Slide 9: Results -->
+        <div class="slide" id="slide9">
+            <h1>Your LCA Results</h1>
+            
+            <div class="result-card">
+                <h3>Mental Fatigue Score</h3>
+                <div class="score" id="fatigueScore">-</div>
+                <div id="fatigueInterpretation"></div>
+            </div>
+
+            <div class="result-card">
+                <h3>Creative Output Score</h3>
+                <div class="score" id="creativityScore">-</div>
+                <div id="creativityInterpretation"></div>
+            </div>
+
+            <div class="result-card">
+                <h3>Workflow Efficiency</h3>
+                <div class="score" id="efficiencyScore">-</div>
+                <div id="efficiencyInterpretation"></div>
+            </div>
+
+            <h3 style="margin-top: 30px;">🎯 Personalized Suggestions</h3>
+            <div id="suggestions"></div>
+
+            <button class="btn" onclick="restartAssessment()">Take Assessment Again</button>
+        </div>
+    </div>
+
+    <script>
+        let currentSlide = 1;
+        const totalSlides = 8;
+        const answers = {};
+
+        function updateProgress() {
+            const progress = ((currentSlide - 1) / totalSlides) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+        }
+
+        function showSlide(slideNumber) {
+            document.querySelectorAll('.slide').forEach(slide => {
+                slide.classList.remove('active');
+            });
+            document.getElementById('slide' + slideNumber).classList.add('active');
+            currentSlide = slideNumber;
+            updateProgress();
+        }
+
+        function nextSlide() {
+            if (currentSlide < totalSlides) {
+                showSlide(currentSlide + 1);
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 1) {
+                showSlide(currentSlide - 1);
+            }
+        }
+
+        function saveAnswer(key, value) {
+            answers[key] = value;
+        }
+
+        function calculateResults() {
+            // Get all answers with defaults
+            const deepWork = parseInt(answers.deepWork) || 10;
+            const sleepQuality = parseInt(answers.sleepQuality) || 6;
+            const physicalActivity = parseInt(answers.physicalActivity) || 3;
+            const satisfaction = parseInt(answers.satisfaction) || 6;
+            const frustration = parseInt(answers.frustration) || 4;
+            const wasteStream = answers.wasteStream || 'contextSwitching';
+
+            // Calculate scores (0-10 scale)
+            const fatigueScore = Math.min(10, Math.max(0,
+                (10 - sleepQuality) + 
+                (frustration * 0.5) + 
+                (deepWork < 10 ? 2 : 0) +
+                (physicalActivity < 2 ? 1 : 0)
+            ));
+
+            const creativityScore = Math.min(10, Math.max(0,
+                (sleepQuality * 0.3) +
+                (deepWork * 0.25) +
+                (satisfaction * 0.3) +
+                (physicalActivity * 0.15)
+            ));
+
+            const efficiencyScore = Math.min(10, Math.max(0,
+                (deepWork * 0.3) +
+                (satisfaction * 0.25) +
+                (sleepQuality * 0.2) -
+                (frustration * 0.25) -
+                (physicalActivity < 2 ? 1 : 0)
+            ));
+
+            // Display results
+            displayScore('fatigueScore', fatigueScore, 'Lower is better');
+            displayScore('creativityScore', creativityScore, 'Higher is better');
+            displayScore('efficiencyScore', efficiencyScore, 'Higher is better');
+
+            // Generate interpretations
+            document.getElementById('fatigueInterpretation').innerHTML = getFatigueInterpretation(fatigueScore);
+            document.getElementById('creativityInterpretation').innerHTML = getCreativityInterpretation(creativityScore);
+            document.getElementById('efficiencyInterpretation').innerHTML = getEfficiencyInterpretation(efficiencyScore);
+
+            // Generate personalized suggestions
+            document.getElementById('suggestions').innerHTML = generateSuggestions(
+                fatigueScore, creativityScore, efficiencyScore, wasteStream, deepWork, sleepQuality
+            );
+
+            showSlide(9);
+        }
+
+        function displayScore(elementId, score, description) {
+            const element = document.getElementById(elementId);
+            element.textContent = score.toFixed(1) + '/10';
+            
+            // Color coding
+            if (elementId === 'fatigueScore') {
+                element.className = score <= 4 ? 'score score-good' : 
+                                  score <= 7 ? 'score score-warning' : 'score score-critical';
+            } else {
+                element.className = score >= 7 ? 'score score-good' : 
+                                  score >= 5 ? 'score score-warning' : 'score score-critical';
+            }
+            
+            element.innerHTML += `<div style="font-size: 14px; color: #7f8c8d; margin-top: 5px;">${description}</div>`;
+        }
+
+        function getFatigueInterpretation(score) {
+            if (score <= 4) return "✅ Excellent energy management!";
+            if (score <= 7) return "⚠️ Moderate fatigue - monitor your energy levels";
+            return "🚨 High fatigue - need immediate recovery strategies";
+        }
+
+        function getCreativityInterpretation(score) {
+            if (score >= 7) return "🎯 High creative output! Ideal conditions";
+            if (score >= 5) return "💡 Moderate creativity - room for optimization";
+            return "🔧 Low creativity - need workflow adjustments";
+        }
+
+        function getEfficiencyInterpretation(score) {
+            if (score >= 7) return "⚡ Highly efficient workflow!";
+            if (score >= 5) return "📊 Moderate efficiency - some waste detected";
+            return "🔄 Low efficiency - significant process improvements needed";
+        }
+
+        function generateSuggestions(fatigue, creativity, efficiency, wasteStream, deepWork, sleepQuality) {
+            let suggestions = [];
+
+            // Fatigue-based suggestions
+            if (fatigue > 7) {
+                suggestions.push("🛌 Prioritize sleep: Aim for 7-8 hours with consistent schedule");
+                suggestions.push("🧘‍♂️ Daily breaks: Implement 5-minute breaks every 90 minutes");
+                suggestions.push("💧 Hydration & nutrition: Monitor water intake and balanced meals");
+            } else if (fatigue > 5) {
+                suggestions.push("⚡ Energy management: Schedule demanding tasks during peak energy hours");
+                suggestions.push("🌅 Morning routine: Start with 15 minutes of planning and prioritization");
+            }
+
+            // Creativity-based suggestions
+            if (creativity < 5) {
+                suggestions.push("🎯 Deep work blocks: Schedule 2-3 hour uninterrupted work sessions");
+                suggestions.push("💡 Idea time: Dedicate 30 minutes daily for creative thinking");
+                suggestions.push("📚 Learning investment: Allocate 2+ hours weekly for skill development");
+            }
+
+            // Efficiency-based suggestions
+            if (efficiency < 5) {
+                suggestions.push("🔄 Batch processing: Group similar tasks (emails, admin) together");
+                suggestions.push("⏰ Time boxing: Use Pomodoro technique (25min work, 5min break)");
+                suggestions.push("📵 Focus protection: Turn off notifications during deep work");
+            }
+
+            // Waste stream specific suggestions
+            const wasteSuggestions = {
+                contextSwitching: "🔄 Implement task batching and time blocking to reduce switching costs",
+                meetings: "📅 Create meeting-free days and require agendas for all meetings",
+                procrastination: "⏰ Use 2-minute rule for small tasks and break large tasks into chunks",
+                email: "📧 Check email only 2-3 times daily and use templates for common responses",
+                admin: "📋 Dedicate specific time slots for administrative work only",
+                technical: "🔧 Create standardized workflows and templates for repetitive tasks"
+            };
+            suggestions.push(wasteSuggestions[wasteStream] || "🎯 Regular workflow review and optimization");
+
+            // Deep work suggestions
+            if (deepWork < 8) {
+                suggestions.push("🎯 Protected focus time: Schedule 2+ hours of deep work daily");
+            }
+
+            // Sleep suggestions
+            if (sleepQuality < 6) {
+                suggestions.push("💤 Sleep hygiene: No screens 1 hour before bed, consistent wake time");
+            }
+
+            return suggestions.map(suggestion => 
+                `<div class="suggestion">${suggestion}</div>`
+            ).join('');
+        }
+
+        function restartAssessment() {
+            currentSlide = 1;
+            Object.keys(answers).forEach(key => delete answers[key]);
+            showSlide(1);
+            
+            // Reset form values
+            document.getElementById('deepWork').value = 10;
+            document.getElementById('sleepQuality').value = 6;
+            document.getElementById('physicalActivity').value = 3;
+            document.getElementById('satisfaction').value = 6;
+            document.getElementById('frustration').value = 4;
+        }
+
+        // Initialize
+        updateProgress();
+    </script>
+</body>
+</html>
